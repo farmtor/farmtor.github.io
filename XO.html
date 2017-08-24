@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link href="StyleSheet.css" rel="stylesheet" />
+    <script src="node_modules/angular/angular.min.js"></script>
+    <script src="InventoryFilters.js"></script>
+    <script>
+        var myModel = {
+            player: { Damage: 2, Hp: 100 },
+            inventory: {
+                bag: [
+                    { name: "Bread", type: "food" },
+                    { name: "Stick", type: "other" },
+                    { name: "Melon", type: "helmet", defence: 0.5 },
+                    { name: "Stick", type: "weapon", damage: 1 },
+                    { name: "Barrel", type: "armor" },
+                    { name: "Grass skirt", type: "armor" },
+                    { name: "Valenki", type: "shoes" },
+                    { name: "Skin helmet", type: "helmet", defence: 0.2 },
+                    { name: "Dandelion", type: "food" },
+                    { name: "Large stick", type: "weapon", damage: 2 },
+                    { name: "Tomato", type: "food" },
+                    { name: "Cosplay suilt", type: "armor" }
+                ],
+                equipment: {
+                    helmet: { name: "none", defence: 0 },
+                    armor: { name: "none", damage: 0 },
+                    shoes: { name: "none", damage: 0 },
+                    weapon: { name: "none", damage: 0 }
+                }
+            },
+            mobs: [
+                { MobName: "Slime", Damage: 10, MaxHp: 1, Hp: 1 },
+                {
+                    MobName: "Centaur", Damage: 7, MaxHp: 5, Hp: 5, Rewards: [
+                        { name: "Spear", type: "weapon", damage: 5 }
+                    ]
+                },
+                { MobName: "Goblin", Damage: 8, MaxHp: 3, Hp: 3 },
+                {
+                    MobName: "Cyclops", Damage: 15, MaxHp: 10, Hp: 10, Rewards: [
+                        { name: "Cyclops eye", type: "other" },
+                        { name: "Actually new item", type: "food" }
+                    ]
+                }
+            ]
+        };
+
+        var myApp = angular.module("myApp");
+        myApp.controller("myController", function ($scope, InventoryFilter) {
+
+            var UpdateInventory = function () {
+
+                $scope.helmets = InventoryFilter.getHelmets(myModel.inventory.bag);
+                $scope.armors = InventoryFilter.getArmors(myModel.inventory.bag);
+                $scope.shoeses = InventoryFilter.getShoes(myModel.inventory.bag);
+                $scope.weapons = InventoryFilter.getWeapons(myModel.inventory.bag);
+            }
+
+            ///
+
+            $scope.GetDamage = function () {
+                result = myModel.player.Damage;
+
+                if (myModel.inventory.equipment.weapon != null) {
+                    result += myModel.inventory.equipment.weapon.damage;
+                }
+
+                return result;
+            };
+
+            $scope.GetDefence = function () {
+                if (myModel.inventory.equipment.helmet != null) {
+                    return myModel.inventory.equipment.helmet.defence;
+                }
+                return 0;
+            };
+
+            $scope.myModel = myModel;
+            $scope.showInventory = false;
+            $scope.currentDamage = $scope.GetDamage();
+            $scope.currentDefence = $scope.GetDefence();
+
+            $scope.HitEnemy = function (mob) {
+
+                $scope.myModel.player.Hp -= Math.floor(mob.Damage * (1 - $scope.currentDefence));
+                mob.Hp -= $scope.currentDamage;
+
+                if (mob.Hp <= 0) {
+                    $scope.myModel.mobs = $scope.myModel.mobs.filter(function (el) {
+                        return el.MobName != mob.MobName;
+                    });
+
+                    if (mob.Rewards != null) {
+                        for (var i = 0; i < mob.Rewards.length; i++) {
+                            myModel.inventory.bag.push(mob.Rewards[i]);
+                        }
+                        UpdateInventory();
+                    }
+                }
+            };
+
+            $scope.GetMobColor = function (mob) {
+                if (mob.Hp / mob.MaxHp <= 0.2) {
+                    return "danger";
+                }
+                else if (mob.Hp / mob.MaxHp <= 0.6) {
+                    return "warning";
+                }
+                else {
+                    return "success";
+                }
+            };
+
+            UpdateInventory();
+
+            $scope.selectedItem = null;
+            $scope.selectItem = function (item) {
+                $scope.selectedItem = item;
+            }
+            $scope.itemUsable = function (item) {
+                return item.type != "other" &&
+                myModel.inventory.bag.filter(function (el) {
+                    return el == item;
+                }).length != 0;
+            }
+            $scope.useItem = function (item) {
+                if (item.type == "helmet") {
+                    $scope.onHelmetSelected(item);
+                }
+                if (item.type == "armor") {
+                    $scope.onArmorSelected(item);
+                }
+                if (item.type == "shoes") {
+                    $scope.onShoesSelected(item);
+                }
+                if (item.type == "weapon") {
+                    $scope.onWeaponSelected(item);
+                }
+                if (item.type == "food") {
+                    myModel.player.Hp += 5;
+                }
+            }
+
+            $scope.canBeDroped = function (item) {
+
+                return (myModel.inventory.bag.filter(function (el) {
+                    return el == item;
+                }).length != 0);
+            }
+            $scope.dropItem = function (item) {
+
+                myModel.inventory.bag = myModel.inventory.bag.filter(function (el) {
+                    return item != el;
+                });
+                if ($scope.selectedItem == item)
+                    $scope.selectedItem = null;
+                UpdateInventory();
+            }
+
+            $scope.onHelmetSelected = function (helmet) {
+                myModel.inventory.equipment.helmet = helmet;
+                $scope.currentDefence = $scope.GetDefence();
+                $scope.currentDamage = $scope.GetDamage();
+            };
+            $scope.onArmorSelected = function (armor) {
+                myModel.inventory.equipment.armor = armor;
+            };
+            $scope.onShoesSelected = function (shoes) {
+                myModel.inventory.equipment.shoes = shoes;
+            };
+            $scope.onWeaponSelected = function (weapon) {
+                myModel.inventory.equipment.weapon = weapon;
+                $scope.currentDamage = $scope.GetDamage();
+            };
+        });
+    </script>
+    <title>MyJSRPG</title>
+</head>
+<body ng-controller="myController">
+    <div>
+        <div class="player">
+            <h3>You: Damage = {{currentDamage}}; Hp = {{myModel.player.Hp}}; Defence = {{currentDefence * 100}}%</h3>
+        </div>
+
+        <input type="checkbox" ng-model="showInventory" /> Show inventory<br />
+        <div class="info" ng-show="showInventory">
+            <div id="bag" class="well" style="overflow:auto">
+                Items amount - {{myModel.inventory.bag.length}}<br />
+                <button class="item" ng-repeat="item in myModel.inventory.bag" ng-click="selectItem(item)"><h5>{{item.name}}</h5></button>
+            </div>
+
+            <div id="itemInfo" class="well">
+                <h3 ng-show="selectedItem == null">No item selected</h3>
+                <div ng-if="selectedItem != null">
+                    <h3>{{selectedItem.name}}</h3>
+                    <h4 ng-if="selectedItem.type == 'weapon'">Damage: {{selectedItem.damage}}</h4>
+                    <button ng-click="useItem(selectedItem)" ng-disabled="!itemUsable(selectedItem)">Use</button>
+                    <button ng-click="dropItem(selectedItem)" ng-disabled="!canBeDroped(selectedItem)">Drop</button>
+                </div>
+            </div>
+
+            <div id="equipment" class="panel panel-default">
+                helmet - <select ng-options="item as item.name for item in helmets" ng-model="myModel.inventory.equipment.helmet" ng-change="onHelmetSelected(myModel.inventory.equipment.helmet)"></select><br />
+                armor  - <select ng-options="item as item.name for item in armors" ng-model="myModel.inventory.equipment.armor" ng-change="onArmorSelected(myModel.inventory.equipment.armor)"></select><br />
+                shoes  - <select ng-options="item as item.name for item in shoeses" ng-model="myModel.inventory.equipment.shoes" ng-change="onShoesSelected(myModel.inventory.equipment.shoes)"></select><br />
+                weapon - <select ng-options="item as item.name for item in weapons" ng-model="myModel.inventory.equipment.weapon" ng-change="onWeaponSelected(myModel.inventory.equipment.weapon)"></select><br />
+                {{myModel.inventory.equipment.helmet}}
+                {{myModel.inventory.equipment.weapon}}
+            </div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Mob</th>
+                    <th>Damage</th>
+                    <th>Hp</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tr ng-repeat="mob in myModel.mobs" class="{{GetMobColor(mob)}}">
+                <th>{{mob.MobName}}</th>
+                <th>{{mob.Damage}}</th>
+                <th>{{mob.Hp}}</th>
+                <th>
+                    <button ng-click="HitEnemy(mob)">Attack</button>
+                </th>
+                <th>
+                    <div ng-if="mob.Rewards != null">
+                        <input type="checkbox" ng-model="showRewards" /> Revards
+                        <div ng-show="showRewards" />
+                        <br />
+                        <div ng-repeat="item in mob.Rewards">
+                        {{item.name}}<button ng-click="selectItem(item)">?</button> 
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

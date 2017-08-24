@@ -1,0 +1,26 @@
+﻿#bag {
+    width: 33%;
+    height: 256px;
+    float: left;
+    background: #62c4e4 ;
+}
+
+#equipment {
+    margin-left: 67%;
+    height: 256px;
+    background: #30c353;
+}
+#itemInfo {
+    width: 34%;
+    height: 256px;
+    float: left;
+}
+
+.player {
+    background: #77ccff
+}
+
+.item {
+    width: 64px;
+    height: 64px;
+}
