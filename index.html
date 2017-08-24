@@ -7,26 +7,14 @@
     <script src="node_modules/angular/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
     <script src="InventoryFilters.js"></script>
+    <script src="inventory.js"></script>
     <script>
         console.log("angular not working");
 
         var myModel = {
             player: { Damage: 2, Hp: 100 },
             inventory: {
-                bag: [
-                    { name: "Bread", type: "food" },
-                    { name: "Stick", type: "other" },
-                    { name: "Melon", type: "helmet", defence: 0.5 },
-                    { name: "Stick", type: "weapon", damage: 1 },
-                    { name: "Barrel", type: "armor" },
-                    { name: "Grass skirt", type: "armor" },
-                    { name: "Valenki", type: "shoes" },
-                    { name: "Skin helmet", type: "helmet", defence: 0.2 },
-                    { name: "Dandelion", type: "food" },
-                    { name: "Large stick", type: "weapon", damage: 2 },
-                    { name: "Tomato", type: "food" },
-                    { name: "Cosplay suilt", type: "armor" }
-                ],
+                bag: undefined,
                 equipment: {
                     helmet: { name: "none", defence: 0 },
                     armor: { name: "none", damage: 0 },
@@ -52,7 +40,9 @@
         };
 
         var myApp = angular.module("myApp");
-        myApp.controller("myController", function ($scope, InventoryFilter) {
+        myApp.controller("myController", function ($scope, InventoryFilter, inventory) {
+
+            myModel.inventory.bag = inventory.itemList;
 
             var UpdateInventory = function () {
 

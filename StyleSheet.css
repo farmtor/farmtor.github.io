@@ -27,7 +27,7 @@
 
 .deathNotification {
     position: fixed;
-    bottom: 50%;
+    top: 50%;
     left: 50%;
     background: #ff3322;
     /* width: 100px;
