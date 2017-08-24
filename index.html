@@ -8,6 +8,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
     <script src="InventoryFilters.js"></script>
     <script src="inventory.js"></script>
+    <script src="moblist.js"></script>
     <script>
         console.log("angular not working");
 
@@ -22,27 +23,14 @@
                     weapon: { name: "none", damage: 0 }
                 }
             },
-            mobs: [
-                { MobName: "Slime", Damage: 10, MaxHp: 1, Hp: 1},
-                {
-                    MobName: "Centaur", Damage: 7, MaxHp: 5, Hp: 5, Rewards: [
-                        { name: "Spear", type: "weapon", damage: 5 }
-                    ]
-                },
-                { MobName: "Goblin", Damage: 8, MaxHp: 3, Hp: 3 },
-                {
-                    MobName: "Cyclops", Damage: 15, MaxHp: 10, Hp: 10, Rewards: [
-                        { name: "Cyclops eye", type: "other" },
-                        { name: "Actually new item", type: "food" }
-                    ]
-                }
-            ]
+            mobs: undefined
         };
 
         var myApp = angular.module("myApp");
-        myApp.controller("myController", function ($scope, InventoryFilter, inventory) {
+        myApp.controller("myController", function ($scope, InventoryFilter, inventory, moblist) {
 
             myModel.inventory.bag = inventory.itemList;
+            myModel.mobs = moblist.list;
 
             var UpdateInventory = function () {
 
