@@ -24,3 +24,28 @@
     width: 64px;
     height: 64px;
 }
+
+.deathNotification {
+    position: fixed;
+    bottom: 50%;
+    left: 50%;
+    background: #ff3322;
+    /* width: 100px;
+    height: 50px; */
+    /* margin-right: -50%; */
+    transform: translate(-50%, -50%)
+}
+
+.restart {
+    top: 100%;
+    left: 0%;
+    width: 49%; 
+    transform: translate(0, 0%);
+}
+
+.wannaLive {
+    top: 100%;
+    left: 50%;
+    width: 49%; 
+    transform: translate(0, 0%);
+}

@@ -35,7 +35,7 @@
                 }
             },
             mobs: [
-                { MobName: "Slime", Damage: 10, MaxHp: 1, Hp: 1 },
+                { MobName: "Slime", Damage: 10, MaxHp: 1, Hp: 1},
                 {
                     MobName: "Centaur", Damage: 7, MaxHp: 5, Hp: 5, Rewards: [
                         { name: "Spear", type: "weapon", damage: 5 }
@@ -102,6 +102,11 @@
                         }
                         UpdateInventory();
                     }
+                }
+
+                if (myModel.player.Hp <= 0){
+
+                    myModel.player.Hp = 0;
                 }
             };
 
@@ -243,6 +248,11 @@
                 </th>
             </tr>
         </table>
+    </div>
+    <div class="deathNotification" ng-if="myModel.player.Hp == 0">
+        <h1> Lol, you died</h1>
+        <button class="restart">Restart</button>
+        <button class="wannaLive">I want to live</button>
     </div>
 </body>
 </html>
